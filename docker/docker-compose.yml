@@ -1,5 +1,6 @@
 services:
 
+  # מסד הנתונים PostgreSQL, שרק ה-backend מדבר איתו.
   postgres:
     image: postgres:15-alpine
     environment:
@@ -15,6 +16,7 @@ services:
       timeout: 5s
       retries: 5
 
+  # ה-API של המוצרים ב-Python, שמדבר עם postgres ומקבל בקשות מ-frontend ומ-stats.
   backend:
     build:
       context: ../app/backend
@@ -22,11 +24,12 @@ services:
       DB_HOST: postgres
       DB_NAME: shoplist
       DB_USER: shopuser
-      DB_PASSWORD: shoppass 
+      DB_PASSWORD: shoppass
     depends_on:
       postgres:
         condition: service_healthy
 
+  # שירות הסטטיסטיקות ב-Node.js, שמביא נתונים מ-backend ומקבל בקשות מ-frontend.
   stats:
     build:
       context: ../app/stats
@@ -35,17 +38,16 @@ services:
     depends_on:
       - backend
 
+  # שרת Nginx שמגיש את האתר לדפדפן ומעביר את בקשות ה-API אל backend ואל stats.
   frontend:
     build:
       context: ../app/frontend
+      dockerfile: Dockerfile.multistage
     ports:
       - "8080:80"
     depends_on:
       - backend
       - stats
-    
-   
 
 volumes:
   postgres-data:
-   
