@@ -1,0 +1,9 @@
+# app-config.yml - app settings (not secrets), read by backend and stats
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+  namespace: shoplist
+data:
+  DB_HOST: postgres                     # name of the postgres Service
+  BACKEND_URL: http://backend:5000      # name of the backend Service + port
